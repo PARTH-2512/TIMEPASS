@@ -46,7 +46,10 @@ async function fetchGridCatalogue(): Promise<GridCameraEntry[] | null> {
   }
 
   try {
-    const res = await fetch(`${CCTV_GRID_HOST}/api/ingest`, { headers });
+    const res = await fetch(`${CCTV_GRID_HOST}/api/ingest`, {
+      headers,
+      signal: AbortSignal.timeout(3000),
+    });
     if (!res.ok) {
       console.warn(`[live-grid] Grid catalogue HTTP ${res.status}: ${res.statusText}`);
       return null;
@@ -579,7 +582,7 @@ async function startServer() {
     const upstreamUrl = `http://127.0.0.1:8010/live/${normalizedId}`;
 
     try {
-      const upstream = await fetch(upstreamUrl);
+      const upstream = await fetch(upstreamUrl, { signal: AbortSignal.timeout(5000) });
       if (!upstream.ok || !upstream.body) {
         res.status(upstream.status).send(`Upstream stream returned ${upstream.status}`);
         return;
@@ -607,9 +610,26 @@ async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
-      appType: 'spa',
+      appType: 'custom',
     });
     app.use(vite.middlewares);
+    app.use('*', async (req: Request, res: Response, next) => {
+      if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/videos')) {
+        return next();
+      }
+      try {
+        const url = req.originalUrl;
+        const htmlPath = path.resolve(process.cwd(), 'index.html');
+        let template = fs.readFileSync(htmlPath, 'utf-8');
+        template = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(template);
+      } catch (e: any) {
+        if (vite && (vite as any).ssrFixStacktrace) {
+          (vite as any).ssrFixStacktrace(e);
+        }
+        next(e);
+      }
+    });
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));

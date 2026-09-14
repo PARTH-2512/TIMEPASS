@@ -20,4 +20,5 @@ ENV/
 *.egg-info/
 .pytest_cache/
 uploads/
+debug_plates/
 
