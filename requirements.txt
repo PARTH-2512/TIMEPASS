@@ -1,0 +1,12 @@
+ultralytics
+opencv-python
+easyocr
+huggingface_hub
+requests
+numpy
+
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic
+python-dotenv
