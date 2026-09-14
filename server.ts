@@ -610,26 +610,9 @@ async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
-      appType: 'custom',
+      appType: 'spa',
     });
     app.use(vite.middlewares);
-    app.use('*', async (req: Request, res: Response, next) => {
-      if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/videos')) {
-        return next();
-      }
-      try {
-        const url = req.originalUrl;
-        const htmlPath = path.resolve(process.cwd(), 'index.html');
-        let template = fs.readFileSync(htmlPath, 'utf-8');
-        template = await vite.transformIndexHtml(url, template);
-        res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(template);
-      } catch (e: any) {
-        if (vite && (vite as any).ssrFixStacktrace) {
-          (vite as any).ssrFixStacktrace(e);
-        }
-        next(e);
-      }
-    });
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
