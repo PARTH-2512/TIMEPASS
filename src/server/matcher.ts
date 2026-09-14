@@ -1,4 +1,4 @@
-import { WatchlistEntry } from '../types';
+import { WatchlistEntry } from '../types/index.ts';
 
 export interface PlateMatchResult {
   isMatch: boolean;

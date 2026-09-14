@@ -9,9 +9,9 @@ import {
   DashboardSummary,
   VehicleRoutePoint,
   PipelineStatus,
-} from '../types';
-import { matchPlateAgainstWatchlist, describePlateDiff, normalizePlate } from './matcher';
-import { generateAhmedabadEvidenceFrame } from '../lib/ahmedabad-evidence';
+} from '../types/index.ts';
+import { matchPlateAgainstWatchlist, describePlateDiff, normalizePlate } from './matcher.ts';
+import { generateAhmedabadEvidenceFrame } from '../lib/ahmedabad-evidence.ts';
 
 interface DatabaseSchema {
   cameras: Camera[];

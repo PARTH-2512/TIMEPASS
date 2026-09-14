@@ -3,7 +3,7 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
-import { db, syncCamerasFromGrid, GridCameraEntry } from './src/server/db';
+import { db, syncCamerasFromGrid, GridCameraEntry } from './src/server/db.ts';
 
 
 // ==================== CCTV GRID CONFIG & CACHE ====================
